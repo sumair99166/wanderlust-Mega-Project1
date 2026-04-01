@@ -1,6 +1,6 @@
 resource "aws_key_pair" "deployer" {
-  key_name   = "deployer-key"
-  public_key = ""
+  key_name   = "project"
+  public_key = "project.pub"
 }
 
 resource "aws_default_vpc" "default" {
@@ -8,8 +8,8 @@ resource "aws_default_vpc" "default" {
 
 
 resource "aws_default_security_group" "default" {
-  vpc_id = aws_vpc.mainvpc.id
-
+  vpc_id = aws_default_vpc.default.id
+  
   ingress{
     from_port = 22
     to_port = 22
@@ -44,9 +44,9 @@ resource "aws_default_security_group" "default" {
 
 
   ingress{
-    from_port = 3000 - 10000
-    to_port = 3000 - 10000
-    protocol = "TCP"
+    from_port = 3000 
+    to_port = 10000
+    protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
     description = "custom open"
   }
@@ -78,9 +78,9 @@ ingress{
   }
 
   ingress{
-    from_port = 30000 - 32767
-    to_port = 30000 - 32767
-    protocol = "TCP"
+    from_port = 30000 
+    to_port =  32767
+    protocol = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
     description = "custom open"
   }
@@ -103,7 +103,7 @@ resource "aws_instance" "testinstance" {
   ami             = var.ami_id
   instance_type   = var.instance_type
   key_name        = aws_key_pair.deployer.key_name
-  security_groups = [aws_security_group.allow_user_to_connect.name]
+  vpc_security_group_ids = [aws_default_security_group.default.id]
   tags = {
     Name = "Automate"
   }
